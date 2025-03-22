@@ -8,11 +8,6 @@
 
 - Frank Abanto
 
-### Contacto
-
-- [www.carpicoder.com](https://carpicoder.com)
-- [hola@carpicoder.com](mailto:hola@carpicoder.com)
-
 ### Redes sociales
 
 - [YouTube](https://youtube.com/@frankabanto)
