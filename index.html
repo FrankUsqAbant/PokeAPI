@@ -11,7 +11,7 @@
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/main.css">
 </head>
@@ -108,8 +108,61 @@
     </nav>
   </header>
 
+  <!-- SECCIÓN HERO DE PORTADA DE BIENVENIDA -->
+  <section class="hero-cover-section" id="hero-cover">
+    <div class="hero-cover-container">
+      <div class="hero-cover-content">
+        <div class="hero-tag">
+          <span class="hero-tag-icon">⚡</span>
+          <span>Base de Datos Oficial de Kanto</span>
+        </div>
+        <h2 class="hero-title">
+          Explora y Domina los <span class="gradient-text">151 Pokémon</span> de Primera Generación
+        </h2>
+        <p class="hero-description">
+          Base de datos interactiva de alto rendimiento. Analiza estadísticas de combate, descubre combinaciones de tipos elementales y explora variantes Shiny en tiempo real.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#pokedex-gallery" class="btn-hero btn-hero-primary" id="btn-hero-explorar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <span>Explorar Pokédex</span>
+          </a>
+
+          <button class="btn-hero btn-hero-secondary" id="btn-hero-random">
+            <span style="font-size: 1.1rem;">🎲</span>
+            <span>Pokémon Aleatorio</span>
+          </button>
+        </div>
+
+        <div class="hero-stats-row">
+          <div class="hero-stat-card">
+            <span class="stat-value">151</span>
+            <span class="stat-label">Pokémon Kanto</span>
+          </div>
+          <div class="hero-stat-card">
+            <span class="stat-value">18</span>
+            <span class="stat-label">Tipos Elementales</span>
+          </div>
+          <div class="hero-stat-card">
+            <span class="stat-value">0 ms</span>
+            <span class="stat-label">Filtros en Caché</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-cover-visual">
+        <div class="hero-img-glow"></div>
+        <img src="./img/hero-cover.webp" alt="Starters de Kanto — Pikachu, Charizard, Blastoise y Venusaur" class="hero-artwork-img">
+      </div>
+    </div>
+  </section>
+
   <!-- Contenedor Principal de Pokémon -->
-  <main class="main-container">
+  <main class="main-container" id="pokedex-gallery">
     <div id="loading-spinner" class="loading-container">
       <div class="pokeball-spinner"></div>
       <p class="loading-text">Cargando base de datos de Kanto...</p>

@@ -296,6 +296,30 @@ function cerrarModal() {
    6. ESCUCHADORES DE EVENTOS
    -------------------------------------------------------------------------- */
 function initEventListeners() {
+  // Botones de la Portada Hero
+  const btnHeroExplorar = document.getElementById("btn-hero-explorar");
+  const btnHeroRandom = document.getElementById("btn-hero-random");
+
+  if (btnHeroExplorar) {
+    btnHeroExplorar.addEventListener("click", (e) => {
+      e.preventDefault();
+      const gallery = document.getElementById("pokedex-gallery");
+      if (gallery) {
+        gallery.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => inputBuscar && inputBuscar.focus(), 600);
+      }
+    });
+  }
+
+  if (btnHeroRandom) {
+    btnHeroRandom.addEventListener("click", () => {
+      if (pokemonCache.length === 0) return;
+      const indiceAleatorio = Math.floor(Math.random() * pokemonCache.length);
+      const pokeRandom = pokemonCache[indiceAleatorio];
+      abrirModalDetalles(pokeRandom);
+    });
+  }
+
   // Búsqueda en vivo
   inputBuscar.addEventListener("input", (e) => {
     terminoBusqueda = e.target.value;
