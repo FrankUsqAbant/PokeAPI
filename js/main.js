@@ -1,6 +1,6 @@
 /**
  * POKÉDEX NEXT-GEN — LÓGICA INTERACTIVA Y RENDIMIENTO
- * Carga en memoria, filtros instantáneos, buscador en vivo y modal de stats
+ * Carga en memoria, filtros instantáneos, buscador en vivo, cabecera retráctil y modal de stats
  */
 
 const POKEMON_TOTAL = 151;
@@ -24,15 +24,65 @@ const modalOverlay = document.getElementById("pokemon-modal");
 const modalDetalle = document.getElementById("modal-detalle");
 const modalBtnCerrar = document.getElementById("modal-btn-cerrar");
 
+// Cabecera retráctil
+const mainHeader = document.getElementById("main-header");
+const btnToggleHeader = document.getElementById("btn-toggle-header");
+const btnOcultarHeader = document.getElementById("btn-ocultar-header");
+
 // Inicialización
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
+  initHeaderControls();
   initEventListeners();
   cargarTodosLosPokemon();
 });
 
 /* --------------------------------------------------------------------------
-   1. CARGA INICIAL CONCURRENTE Y ORDENADA
+   1. CONTROL INTELIGENTE DE CABECERA RETRÁCTIL
+   -------------------------------------------------------------------------- */
+function initHeaderControls() {
+  let lastScrollY = window.scrollY;
+
+  function ocultarCabecera() {
+    mainHeader.classList.add("hidden");
+    btnToggleHeader.classList.add("visible");
+  }
+
+  function mostrarCabecera() {
+    mainHeader.classList.remove("hidden");
+    btnToggleHeader.classList.remove("visible");
+  }
+
+  if (btnOcultarHeader) {
+    btnOcultarHeader.addEventListener("click", ocultarCabecera);
+  }
+
+  if (btnToggleHeader) {
+    btnToggleHeader.addEventListener("click", () => {
+      if (mainHeader.classList.contains("hidden")) {
+        mostrarCabecera();
+      } else {
+        ocultarCabecera();
+      }
+    });
+  }
+
+  // Ocultar al deslizar hacia abajo, mostrar al deslizar hacia arriba
+  window.addEventListener("scroll", () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > 150 && currentScrollY > lastScrollY) {
+      // Scroll hacia abajo
+      ocultarCabecera();
+    } else if (currentScrollY < lastScrollY - 20 || currentScrollY <= 50) {
+      // Scroll hacia arriba o cerca del tope
+      mostrarCabecera();
+    }
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+}
+
+/* --------------------------------------------------------------------------
+   2. CARGA INICIAL CONCURRENTE Y ORDENADA
    -------------------------------------------------------------------------- */
 async function cargarTodosLosPokemon() {
   try {
@@ -62,7 +112,7 @@ async function cargarTodosLosPokemon() {
 }
 
 /* --------------------------------------------------------------------------
-   2. RENDERIZADO DE TARJETAS EN EL DOM
+   3. RENDERIZADO DE TARJETAS COMPACTAS EN EL DOM
    -------------------------------------------------------------------------- */
 function renderizarPokemon(pokemons) {
   listaPokemon.innerHTML = "";
@@ -98,7 +148,7 @@ function renderizarPokemon(pokemons) {
     card.innerHTML = `
       <p class="pokemon-id-back">#${pokeId}</p>
       <div class="pokemon-imagen">
-        <img src="${sprite}" alt="${poke.name}" loading="lazy">
+        <img src="${sprite}" alt="${poke.name}" loading="lazy" width="95" height="95">
       </div>
       <div class="pokemon-info">
         <div class="nombre-contenedor">
@@ -123,7 +173,7 @@ function renderizarPokemon(pokemons) {
 }
 
 /* --------------------------------------------------------------------------
-   3. FILTRADO Y BÚSQUEDA REACTIVA (0 MS)
+   4. FILTRADO Y BÚSQUEDA REACTIVA (0 MS)
    -------------------------------------------------------------------------- */
 function aplicarFiltros() {
   const query = terminoBusqueda.toLowerCase().trim();
@@ -143,7 +193,7 @@ function aplicarFiltros() {
 }
 
 /* --------------------------------------------------------------------------
-   4. MODAL INTERACTIVO DE ESTADÍSTICAS
+   5. MODAL INTERACTIVO DE ESTADÍSTICAS
    -------------------------------------------------------------------------- */
 function abrirModalDetalles(poke) {
   const pokeId = formatearId(poke.id);
@@ -243,7 +293,7 @@ function cerrarModal() {
 }
 
 /* --------------------------------------------------------------------------
-   5. ESCUCHADORES DE EVENTOS
+   6. ESCUCHADORES DE EVENTOS
    -------------------------------------------------------------------------- */
 function initEventListeners() {
   // Búsqueda en vivo
@@ -286,7 +336,7 @@ function initEventListeners() {
 }
 
 /* --------------------------------------------------------------------------
-   6. GESTIÓN DE TEMA (MODO CLARO / OSCURO)
+   7. GESTIÓN DE TEMA (MODO CLARO / OSCURO)
    -------------------------------------------------------------------------- */
 function initTheme() {
   const savedTheme = localStorage.getItem("pokedex_theme") || 
