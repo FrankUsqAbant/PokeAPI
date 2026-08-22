@@ -148,7 +148,7 @@ function renderizarPokemon(pokemons) {
     card.innerHTML = `
       <p class="pokemon-id-back">#${pokeId}</p>
       <div class="pokemon-imagen">
-        <img src="${sprite}" alt="${poke.name}" loading="lazy" width="95" height="95">
+        <img src="${sprite}" alt="${poke.name}" loading="lazy">
       </div>
       <div class="pokemon-info">
         <div class="nombre-contenedor">
