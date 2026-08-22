@@ -119,12 +119,12 @@ function renderizarPokemon(pokemons) {
 
   if (pokemons.length === 0) {
     sinResultados.style.display = "block";
-    contadorTexto.textContent = "0 Pokémon encontrados";
+    if (contadorTexto) contadorTexto.textContent = "0 Pokémon encontrados";
     return;
   }
 
   sinResultados.style.display = "none";
-  contadorTexto.textContent = `${pokemons.length} Pokémon ${filtroTipoActual === 'ver-todos' ? 'registrados' : 'de tipo ' + filtroTipoActual}`;
+  if (contadorTexto) contadorTexto.textContent = `${pokemons.length} Pokémon ${filtroTipoActual === 'ver-todos' ? 'registrados' : 'de tipo ' + filtroTipoActual}`;
 
   const fragment = document.createDocumentFragment();
 
