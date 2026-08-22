@@ -1,0 +1,19 @@
+# Node & Dependencias
+node_modules/
+npm-debug.log*
+
+# Entorno y Secretos
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Sistema Operativo y Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.cache/
+.system_generated/
+*.log
