@@ -34,7 +34,7 @@ for (const id of ids) {
   frames.forEach((d, i) => fs.writeFileSync(path.join(dir, `f${String(i).padStart(3, '0')}.png`), Buffer.from(d.split(',')[1], 'base64')));
   const webp = path.join(OUT, `${id}.webp`);
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', '24', '-i', path.join(dir, 'f%03d.png'),
-    '-vf', 'scale=400:-1:flags=lanczos', '-loop', '0', '-c:v', 'libwebp_anim', '-lossless', '0', '-q:v', '70', '-compression_level', '6', webp]);
+    '-vf', 'scale=360:-1:flags=lanczos', '-loop', '0', '-c:v', 'libwebp_anim', '-lossless', '0', '-q:v', '60', '-compression_level', '6', webp]);
   fs.copyFileSync(path.join(dir, 'f012.png'), path.join(OUT, `${id}-preview.png`));
   fs.rmSync(dir, { recursive: true });
   const kb = Math.round(fs.statSync(webp).size / 1024);
