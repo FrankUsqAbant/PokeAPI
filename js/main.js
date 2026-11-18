@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initHeaderControls();
   initEventListeners();
+  initMovimientoTarjetas();
+  initHeroVivo();
   cargarTodosLosPokemon();
 });
 
@@ -112,6 +114,64 @@ async function cargarTodosLosPokemon() {
 }
 
 /* --------------------------------------------------------------------------
+   2b. "VIDA" EN LAS TARJETAS: reposo 3D, loop animado al apuntar, inclinación
+   Los loops son WebP pre-renderizados (GitHub Actions): el navegador solo reproduce.
+   -------------------------------------------------------------------------- */
+const rutaReposo = id => `img/3d/s/${id}.webp`;
+const rutaAnimada = id => `img/3d/${id}.webp`;
+const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");
+let tarjetaViva = null;
+
+function activarTarjeta(card, conInclinacion) {
+  if (tarjetaViva === card) return;
+  desactivarTarjeta();
+  tarjetaViva = card;
+  card.classList.add("is-live");
+  if (sinMovimiento.matches) return;
+  const img = card.querySelector(".pokemon-imagen img");
+  const url = rutaAnimada(card.dataset.id);
+  const pre = new Image();               // no cambiar hasta tenerlo descargado: sin parpadeo
+  pre.onload = () => { if (tarjetaViva === card) img.src = url; };
+  pre.src = url;
+}
+
+function desactivarTarjeta() {
+  if (!tarjetaViva) return;
+  const card = tarjetaViva;
+  tarjetaViva = null;
+  card.classList.remove("is-live");
+  card.style.removeProperty("--rx"); card.style.removeProperty("--ry");
+  const img = card.querySelector(".pokemon-imagen img");
+  if (img) img.src = rutaReposo(card.dataset.id);
+}
+
+function initMovimientoTarjetas() {
+  listaPokemon.addEventListener("pointermove", e => {
+    if (e.pointerType === "touch") return;
+    const card = e.target.closest(".pokemon");
+    if (!card) return desactivarTarjeta();
+    activarTarjeta(card);
+    if (sinMovimiento.matches) return;
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    card.style.setProperty("--rx", ((0.5 - py) * 9).toFixed(2) + "deg");
+    card.style.setProperty("--ry", ((px - 0.5) * 11).toFixed(2) + "deg");
+    card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+    card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+  });
+  listaPokemon.addEventListener("pointerleave", desactivarTarjeta);
+  listaPokemon.addEventListener("focusin", e => {
+    const card = e.target.closest(".pokemon");
+    if (card && card.matches(":focus-visible")) activarTarjeta(card);
+  });
+  listaPokemon.addEventListener("focusout", desactivarTarjeta);
+  listaPokemon.addEventListener("keydown", e => {
+    const card = e.target.closest(".pokemon");
+    if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); card.click(); }
+  });
+}
+
+/* --------------------------------------------------------------------------
    3. RENDERIZADO DE TARJETAS COMPACTAS EN EL DOM
    -------------------------------------------------------------------------- */
 function renderizarPokemon(pokemons) {
@@ -144,11 +204,14 @@ function renderizarPokemon(pokemons) {
     card.style.setProperty("--card-accent", colorAcento.trim());
     card.style.setProperty("--card-glow", colorAcento.trim() + "55");
     card.setAttribute("data-id", poke.id);
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Ver detalles de ${poke.name}`);
 
     card.innerHTML = `
       <p class="pokemon-id-back">#${pokeId}</p>
       <div class="pokemon-imagen">
-        <img src="${sprite}" alt="${poke.name}" loading="lazy">
+        <img src="${rutaReposo(poke.id)}" data-art="${sprite}" alt="${poke.name}" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.art">
       </div>
       <div class="pokemon-info">
         <div class="nombre-contenedor">
@@ -243,7 +306,7 @@ function abrirModalDetalles(poke) {
     </div>
 
     <div class="modal-img-wrapper">
-      <img id="modal-pokemon-img" class="modal-img" src="${spriteNormal}" alt="${poke.name}">
+      <img id="modal-pokemon-img" class="modal-img" src="${rutaAnimada(poke.id)}" alt="${poke.name}" onerror="this.onerror=null;this.src='${spriteNormal}'">
       ${spriteShiny ? `
         <button id="btn-toggle-shiny" class="shiny-switch-btn">
           <span>✨</span> Ver Versión Shiny
@@ -275,7 +338,8 @@ function abrirModalDetalles(poke) {
     btnShiny.addEventListener("click", () => {
       esShiny = !esShiny;
       const img = document.getElementById("modal-pokemon-img");
-      img.src = esShiny ? spriteShiny : spriteNormal;
+      img.onerror = null;
+      img.src = esShiny ? spriteShiny : rutaAnimada(poke.id);
       btnShiny.classList.toggle("active", esShiny);
       btnShiny.innerHTML = esShiny ? "<span>⭐</span> Versión Shiny Activa" : "<span>✨</span> Ver Versión Shiny";
     });
@@ -380,4 +444,30 @@ function initTheme() {
 
 function formatearId(id) {
   return id.toString().padStart(3, "0");
+}
+
+
+/* --------------------------------------------------------------------------
+   HERO VIVO: los starters + Pikachu respirando sobre el resplandor, con paralaje
+   -------------------------------------------------------------------------- */
+function initHeroVivo() {
+  const stage = document.querySelector(".hero-stage");
+  if (!stage) return;
+  const mons = [...stage.querySelectorAll(".hero-mon")];
+  if (!sinMovimiento.matches) {
+    mons.forEach(img => {                // reposo ya visible; el loop entra cuando termina de bajar
+      const pre = new Image();
+      pre.onload = () => { img.src = img.dataset.anim; };
+      pre.src = img.dataset.anim;
+    });
+    stage.addEventListener("pointermove", e => {
+      if (e.pointerType === "touch") return;
+      const r = stage.getBoundingClientRect();
+      stage.style.setProperty("--px", (((e.clientX - r.left) / r.width) - 0.5).toFixed(3));
+      stage.style.setProperty("--py", (((e.clientY - r.top) / r.height) - 0.5).toFixed(3));
+    });
+    stage.addEventListener("pointerleave", () => {
+      stage.style.setProperty("--px", 0); stage.style.setProperty("--py", 0);
+    });
+  }
 }

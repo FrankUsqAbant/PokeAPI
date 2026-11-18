@@ -692,8 +692,9 @@ body {
   transition: opacity 0.3s ease;
 }
 
-.pokemon:hover {
-  transform: translateY(-8px) scale(1.02);
+.pokemon:hover,
+.pokemon.is-live {
+  transform: perspective(800px) translateY(-8px) scale(1.02) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   border-color: var(--card-accent, var(--border-glow));
   box-shadow: var(--shadow-md), 0 0 35px var(--card-glow, rgba(239, 68, 68, 0.25));
 }
@@ -735,7 +736,8 @@ body {
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.pokemon:hover .pokemon-imagen img {
+.pokemon:hover .pokemon-imagen img,
+.pokemon.is-live .pokemon-imagen img {
   transform: scale(1.15) translateY(-4px);
 }
 
@@ -1083,3 +1085,45 @@ body {
   font-size: 0.82rem;
   margin-top: 0.4rem;
 }
+
+
+/* ===== VIDA 3D: tarjetas, hero y accesibilidad ===== */
+.pokemon { will-change: transform; outline-offset: 3px; }
+.pokemon:focus-visible { outline: 2px solid var(--card-accent, var(--accent)); }
+.pokemon::after {                      /* brillo holográfico que sigue al cursor */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; border-radius: inherit;
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 30%), rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(115deg, transparent 30%, var(--card-glow, rgba(255,255,255,.12)) 48%, transparent 66%);
+  mix-blend-mode: soft-light; transition: opacity .3s ease;
+}
+.pokemon.is-live::after { opacity: 1; }
+.pokemon-imagen img { filter: none; }           /* el render ya trae su sombra de contacto */
+.pokemon-imagen { width: 150px; height: 150px; }
+
+.hero-stage {
+  position: relative; z-index: 2; width: 100%; max-width: 560px; aspect-ratio: 1 / .92;
+  --px: 0; --py: 0;
+}
+.hero-floor {
+  position: absolute; left: 6%; right: 6%; bottom: 7%; height: 18%; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%); filter: blur(6px);
+}
+.hero-mon {
+  position: absolute; height: auto; user-select: none; -webkit-user-drag: none;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+  transform: translate3d(calc(var(--px) * var(--d, 14px)), calc(var(--py) * var(--d, 14px) * .6), 0);
+}
+.hero-mon--c { width: 66%; left: 17%; bottom: 3%; --d: 22px; z-index: 3; }
+.hero-mon--l { width: 50%; left: -4%; bottom: 8%; --d: -10px; z-index: 2; }
+.hero-mon--r { width: 50%; right: -4%; bottom: 8%; --d: -10px; z-index: 2; }
+.hero-mon--f { width: 30%; left: 4%; bottom: -2%; --d: 34px; z-index: 4; }
+@media (max-width: 900px) { .hero-stage { max-width: 420px; margin: 0 auto; } }
+@media (prefers-reduced-motion: reduce) {
+  .pokemon, .pokemon:hover, .pokemon.is-live { transition: none; transform: none; }
+  .hero-mon { transition: none; transform: none; }
+}
+
+/* Modal: el loop animado merece espacio */
+.modal-img { width: min(300px, 62vw); height: min(300px, 62vw); filter: none; }
+.hero-mon--f { width: 48%; left: -2%; bottom: -8%; }
