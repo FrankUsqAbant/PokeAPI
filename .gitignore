@@ -17,3 +17,5 @@ Thumbs.db
 .cache/
 .system_generated/
 *.log
+node_modules/
+out/
