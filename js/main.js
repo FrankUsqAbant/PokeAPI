@@ -88,16 +88,26 @@ function initHeaderControls() {
    -------------------------------------------------------------------------- */
 async function cargarTodosLosPokemon() {
   try {
-    const promesas = [];
-    for (let i = 1; i <= POKEMON_TOTAL; i++) {
-      promesas.push(fetch(`${API_URL}${i}`).then(res => {
-        if (!res.ok) throw new Error(`Error cargando Pokémon #${i}`);
-        return res.json();
-      }));
-    }
+    // 1) Datos estáticos del propio sitio (rápido y cacheable); 2) respaldo: PokéAPI
+    let resultados = null;
+    try {
+      const res = await fetch("data/pokedex.json");
+      if (res.ok) {
+        resultados = await res.json();
+        if (!Array.isArray(resultados) || resultados.length !== POKEMON_TOTAL) resultados = null;
+      }
+    } catch (_) { resultados = null; }
 
-    // Promise.all garantiza la resolución en el orden exacto (#1 a #151)
-    const resultados = await Promise.all(promesas);
+    if (!resultados) {
+      const promesas = [];
+      for (let i = 1; i <= POKEMON_TOTAL; i++) {
+        promesas.push(fetch(`${API_URL}${i}`).then(res => {
+          if (!res.ok) throw new Error(`Error cargando Pokémon #${i}`);
+          return res.json();
+        }));
+      }
+      resultados = await Promise.all(promesas);
+    }
     pokemonCache = resultados;
 
     if (loadingSpinner) loadingSpinner.style.display = "none";
@@ -211,7 +221,7 @@ function renderizarPokemon(pokemons) {
     card.innerHTML = `
       <p class="pokemon-id-back">#${pokeId}</p>
       <div class="pokemon-imagen">
-        <img src="${rutaReposo(poke.id)}" data-art="${sprite}" alt="${poke.name}" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.art">
+        <img src="${rutaReposo(poke.id)}" data-art="${sprite}" alt="${poke.name}" width="150" height="150" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=this.dataset.art">
       </div>
       <div class="pokemon-info">
         <div class="nombre-contenedor">
@@ -454,12 +464,22 @@ function initHeroVivo() {
   const stage = document.querySelector(".hero-stage");
   if (!stage) return;
   const mons = [...stage.querySelectorAll(".hero-mon")];
+  const con = navigator.connection || {};
+  const conexionLenta = con.saveData || /(^|-)2g|3g/.test(con.effectiveType || "");
   if (!sinMovimiento.matches) {
-    mons.forEach(img => {                // reposo ya visible; el loop entra cuando termina de bajar
-      const pre = new Image();
-      pre.onload = () => { img.src = img.dataset.anim; };
-      pre.src = img.dataset.anim;
-    });
+    // Los loops (~2 MB) se piden DESPUÉS de que la página esté lista y el navegador libre,
+    // el reposo ya es visible; en conexión lenta o ahorro de datos no se descargan.
+    const cargarLoops = () => {
+      if (conexionLenta) return;
+      mons.forEach(img => {
+        const pre = new Image();
+        pre.onload = () => { img.src = img.dataset.anim; };
+        pre.src = img.dataset.anim;
+      });
+    };
+    const alCargar = () => ("requestIdleCallback" in window)
+      ? requestIdleCallback(cargarLoops, { timeout: 2500 }) : setTimeout(cargarLoops, 1200);
+    if (document.readyState === "complete") alCargar(); else window.addEventListener("load", alCargar, { once: true });
     stage.addEventListener("pointermove", e => {
       if (e.pointerType === "touch") return;
       const r = stage.getBoundingClientRect();

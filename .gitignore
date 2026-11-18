@@ -19,3 +19,4 @@ Thumbs.db
 *.log
 node_modules/
 out/
+_site/

@@ -1,62 +1,44 @@
-# ⚡ Pokédex Next-Gen — Base de Datos de Pokémon
+# ⚡ Pokédex Next-Gen
 
 <p align="center">
   <a href="https://frankusqabant.github.io/PokeAPI/" target="_blank" rel="noopener noreferrer">
-    <img src="img/preview.webp" alt="Vista Previa de Pokédex — Clic para abrir en vivo" width="100%" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);">
+    <img src="img/preview.webp" alt="Pokédex Next-Gen: Blastoise, Charizard, Venusaur y Pikachu en 3D — clic para abrir el sitio" width="100%">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://frankusqabant.github.io/PokeAPI/">
-    <img src="https://img.shields.io/badge/Demo_en_Vivo-GitHub_Pages-10b981?style=for-the-badge&logo=githubpages&logoColor=white" alt="Demo en Vivo">
-  </a>
-  <img src="https://img.shields.io/badge/Pok%C3%A9mon-151_Kanto-ef4444?style=for-the-badge&logo=pokemon" alt="151 Kanto">
-  <img src="https://img.shields.io/badge/API-Pok%C3%A9API_v2-ffcb05?style=for-the-badge&logo=javascript&logoColor=black" alt="PokéAPI">
-  <img src="https://img.shields.io/badge/Estilo-Holographic_CSS-00F5D4?style=for-the-badge&logo=css3&logoColor=black" alt="CSS3">
-  <img src="https://img.shields.io/badge/Temas-Dark_%26_Light-8b5cf6?style=for-the-badge" alt="Temas">
+  <a href="https://frankusqabant.github.io/PokeAPI/"><b>🌐 Ver el sitio en vivo</b></a>
 </p>
 
-<p align="center">
-  🌐 <b>Sitio Web Desplegado:</b> <a href="https://frankusqabant.github.io/PokeAPI/">https://frankusqabant.github.io/PokeAPI/</a>
-</p>
+Pokédex de los **151 Pokémon de Kanto**, con modelos 3D que se mueven, hecha con HTML, CSS y JavaScript puro (sin frameworks).
 
----
+## ✨ Qué tiene
 
-## 🚀 Descripción General
+- 🎬 **Hero animado:** los starters y Pikachu en 3D, con paralaje al mover el cursor.
+- 🃏 **Tarjetas con vida:** al apuntar una, su Pokémon se anima, la tarjeta se inclina y brilla.
+- 🔍 **Búsqueda y filtros por tipo** al instante, con modal de estadísticas y versión Shiny.
+- 🌓 **Tema oscuro/claro**, teclado completo y respeto a `prefers-reduced-motion`.
 
-**Pokédex Next-Gen** es una aplicación web moderna, interactiva y de alto rendimiento que consulta la API oficial de **PokéAPI** para explorar los 151 Pokémon de la región de Kanto.
+## 🚀 Cómo es tan rápido
 
-Cuenta con una **Portada Hero cinematográfica**, arquitectura con **carga ordenada concurrente** (`Promise.all`), **caché en memoria** para filtrado y búsqueda instantánea (0 ms), cabecera retráctil con disparador flotante de Pokéball y un modal detallado de estadísticas con alternador de versión **Shiny ✨**.
+- **El 3D no se calcula en tu dispositivo.** Los modelos se renderizan una sola vez en GitHub Actions y la web solo muestra imágenes WebP animadas (sin WebGL en vivo).
+- Los datos de los 151 están en `data/pokedex.json`: **0 peticiones a PokéAPI** al cargar (queda como respaldo).
+- El reposo de cada tarjeta pesa ~10 KB; el loop animado se descarga solo al apuntarla. Los loops del hero se piden cuando la página ya cargó y se omiten con ahorro de datos o conexión lenta.
 
----
-
-## ✨ Características Principales
-
-- 🎬 **Portada Hero de Bienvenida:** Presentación visual con artwork de starters de Kanto y botón para descubrir un Pokémon aleatorio.
-- ⚡ **Rendimiento Instantáneo:** Carga garantizada del #001 al #151 con caché en memoria (sin peticiones de red redundantes).
-- 🔍 **Buscador en Tiempo Real:** Filtrado simultáneo y reactivo por nombre o número de Pokédex.
-- 🎛️ **Cabecera Retráctil Inteligente:** Se auto-oculta al hacer scroll para maximizar la pantalla y se invoca fácilmente con el botón flotante de Pokéball.
-- 🎨 **Tarjetas con Colores de Tipo:** Iluminación neón adaptativa según el elemento de cada Pokémon (Fuego, Agua, Planta, Eléctrico, Dragón, etc.).
-- 📊 **Modal de Estadísticas de Combate:** Gráficos de barras (HP, Ataque, Defensa, Velocidad), peso, altura, habilidades y switch Shiny.
-- 🌓 **Modo Oscuro & Claro:** Selector de tema accesible con persistencia en `localStorage`.
-
----
-
-## 📂 Estructura del Repositorio
+## 🗂️ Estructura
 
 ```text
-PokeAPI/
-├── .github/workflows/deploy.yml # Pipeline CI/CD para GitHub Pages
-├── css/main.css                 # Sistema de diseño, variables y temas
-├── js/main.js                   # Lógica de carga ordenada, caché, filtros y modal
-├── img/                         # Logo, fondos y capturas en WebP ultraligero
-├── index.html                   # Interfaz semántica estructurada
-└── README.md                    # Documentación del proyecto
+index.html · css/ · js/        Sitio
+data/pokedex.json              Datos de los 151 (scripts/build_data.mjs)
+img/3d/                        Reposo (s/), loops animados y hero
+scripts/render/                Render 3D → WebP animado (Three.js + Playwright)
+.github/workflows/             deploy.yml (Pages) y render.yml (render 3D)
 ```
 
----
+Regenerar el 3D: ejecutar el workflow **Render 3D a WebP animado** (`ids`, `size`, `outw`, `q`, `arms`). Los `.glb` originales están en `models/` y no se publican.
 
-## 📄 Créditos y Licencia
+## 📄 Créditos y licencia
 
-- Datos obtenidos de la API pública oficial de [PokéAPI](https://pokeapi.co/).
-- Pokémon y sus personajes son marcas registradas de Nintendo, Game Freak y Creatures Inc.
+- Datos: [PokéAPI](https://pokeapi.co/). Modelos 3D: [Pokémon 3D API](https://github.com/Pokemon-3D-api/assets) (originales de terceros en Sketchfab).
+- Proyecto personal, sin fines comerciales. Pokémon y sus personajes son marcas de Nintendo, Game Freak y Creatures Inc.
+- Código bajo licencia [MIT](LICENSE).

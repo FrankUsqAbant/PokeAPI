@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="./img/logo.png">
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preload" as="fetch" href="data/pokedex.json" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -147,10 +148,10 @@
         <div class="hero-img-glow"></div>
         <div class="hero-stage" role="img" aria-label="Venusaur, Charizard, Blastoise y Pikachu en 3D animado">
           <div class="hero-floor"></div>
-          <img class="hero-mon hero-mon--l" src="img/3d/hero/9-still.webp" data-anim="img/3d/hero/9.webp" alt="" width="640" height="640">
-          <img class="hero-mon hero-mon--r" src="img/3d/hero/3-still.webp" data-anim="img/3d/hero/3.webp" alt="" width="640" height="640">
-          <img class="hero-mon hero-mon--c" src="img/3d/hero/6-still.webp" data-anim="img/3d/hero/6.webp" alt="" width="640" height="640" fetchpriority="high">
-          <img class="hero-mon hero-mon--f" src="img/3d/hero/25-still.webp" data-anim="img/3d/hero/25.webp" alt="" width="640" height="640">
+          <img class="hero-mon hero-mon--l" src="img/3d/hero/9-still.webp" data-anim="img/3d/hero/9.webp" alt="" width="480" height="480">
+          <img class="hero-mon hero-mon--r" src="img/3d/hero/3-still.webp" data-anim="img/3d/hero/3.webp" alt="" width="480" height="480">
+          <img class="hero-mon hero-mon--c" src="img/3d/hero/6-still.webp" data-anim="img/3d/hero/6.webp" alt="" width="480" height="480" fetchpriority="high">
+          <img class="hero-mon hero-mon--f" src="img/3d/hero/25-still.webp" data-anim="img/3d/hero/25.webp" alt="" width="480" height="480">
         </div>
       </div>
     </div>
@@ -190,7 +191,7 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js" defer></script>
 </body>
 
 </html>
