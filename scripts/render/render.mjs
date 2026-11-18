@@ -7,6 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'out');
+const SIZE = +(process.env.SIZE || 512), OUTW = +(process.env.OUTW || 360);
 const ids = (process.env.IDS || '25,7,1').split(',').map(s => s.trim()).filter(Boolean);
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -20,10 +21,10 @@ const server = http.createServer((req, res) => {
 }).listen(8123);
 
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const page = await browser.newPage({ viewport: { width: 512, height: 512 } });
+const page = await browser.newPage({ viewport: { width: SIZE, height: SIZE } });
 page.on('console', m => console.log('[page]', m.text()));
 page.on('pageerror', e => console.log('[pageerror]', e.message));
-await page.goto('http://localhost:8123/');
+await page.goto(`http://localhost:8123/?s=${SIZE}`);
 await page.waitForFunction(() => window.ready === true, null, { timeout: 60000 });
 
 const report = [];
@@ -34,8 +35,8 @@ for (const id of ids) {
   frames.forEach((d, i) => fs.writeFileSync(path.join(dir, `f${String(i).padStart(3, '0')}.png`), Buffer.from(d.split(',')[1], 'base64')));
   const webp = path.join(OUT, `${id}.webp`);
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', '24', '-i', path.join(dir, 'f%03d.png'),
-    '-vf', 'scale=360:-1:flags=lanczos', '-loop', '0', '-c:v', 'libwebp_anim', '-lossless', '0', '-q:v', '60', '-compression_level', '6', webp]);
-  fs.copyFileSync(path.join(dir, 'f012.png'), path.join(OUT, `${id}-preview.png`));
+    '-vf', `scale=${OUTW}:-1:flags=lanczos`, '-loop', '0', '-c:v', 'libwebp_anim', '-lossless', '0', '-q:v', '60', '-compression_level', '6', webp]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path.join(dir, 'f012.png'), '-vf', `scale=${OUTW}:-1:flags=lanczos`, '-q:v', '82', path.join(OUT, `${id}-still.webp`)]);
   fs.rmSync(dir, { recursive: true });
   const kb = Math.round(fs.statSync(webp).size / 1024);
   report.push({ id, hasClip, clips, clipName, pingpong, kb, seg: ((Date.now() - t0) / 1000).toFixed(1) });

@@ -6,6 +6,12 @@ on:
       ids:
         description: "Numeros separados por coma, o 'all' para los 151"
         default: "all"
+      size:
+        description: "Tamano interno del render (px)"
+        default: "512"
+      outw:
+        description: "Ancho de salida (px)"
+        default: "360"
   push:
     branches: ["render-3d"]
     paths: ["scripts/render/**", ".github/workflows/render.yml"]
@@ -52,7 +58,8 @@ jobs:
           else
             export IDS="25,7,1,149"
           fi
-          echo "IDS=$IDS"
+          export SIZE="${{ github.event.inputs.size || 512 }}" OUTW="${{ github.event.inputs.outw || 360 }}"
+          echo "IDS=$IDS SIZE=$SIZE OUTW=$OUTW"
           node scripts/render/render.mjs
       - uses: actions/upload-artifact@v4
         with:
