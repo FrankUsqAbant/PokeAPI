@@ -12,6 +12,9 @@ on:
       outw:
         description: "Ancho de salida (px)"
         default: "360"
+      q:
+        description: "Calidad WebP (0-100)"
+        default: "60"
       arms:
         description: "Grados para bajar los brazos en T-pose (0 = no)"
         default: "0"
@@ -61,7 +64,7 @@ jobs:
           else
             export IDS="25,7,1,149"
           fi
-          export SIZE="${{ github.event.inputs.size || 512 }}" OUTW="${{ github.event.inputs.outw || 360 }}" ARMS="${{ github.event.inputs.arms || 0 }}"
+          export SIZE="${{ github.event.inputs.size || 512 }}" OUTW="${{ github.event.inputs.outw || 360 }}" ARMS="${{ github.event.inputs.arms || 0 }}" Q="${{ github.event.inputs.q || 60 }}"
           echo "IDS=$IDS SIZE=$SIZE OUTW=$OUTW"
           node scripts/render/render.mjs
       - uses: actions/upload-artifact@v4
