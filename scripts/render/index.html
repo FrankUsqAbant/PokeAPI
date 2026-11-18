@@ -20,12 +20,27 @@ const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 const draco = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 const loader = new GLTFLoader().setDRACOLoader(draco);
 
-window.renderFrames = async (id, N = 48) => {
+window.renderFrames = async (id, N = 48, armsDown = 0) => {
   const gltf = await loader.loadAsync(`/models/${id}.glb`);
   const scene = new THREE.Scene(); scene.environment = envTex; scene.environmentIntensity = 0.9;
   const root = gltf.scene; const pivot = new THREE.Group(); pivot.add(root); scene.add(pivot);
   root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
 
+  // T-pose -> brazos relajados: gira los huesos LArm/RArm en el eje Z del mundo
+  let armsPosed = 0;
+  if (armsDown > 0) {
+    root.updateMatrixWorld(true);
+    const arms = []; root.traverse(o => { if (o.isBone && /(^|\s)[LR]Arm$/.test(o.name)) arms.push(o); });
+    const xs = arms.map(b => new THREE.Vector3().setFromMatrixPosition(b.matrixWorld).x);
+    const mid = xs.length ? xs.reduce((a,b)=>a+b,0)/xs.length : 0;
+    arms.forEach((b, k) => {
+      const sgn = Math.sign(xs[k] - mid) || 1;
+      const W = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), -sgn * THREE.MathUtils.degToRad(armsDown));
+      const Pq = b.parent.getWorldQuaternion(new THREE.Quaternion());
+      b.quaternion.premultiply(Pq.clone().invert().multiply(W).multiply(Pq)); armsPosed++;
+    });
+    root.updateMatrixWorld(true);
+  }
   const hasClip = gltf.animations.length > 0;
   let mixer = null, dur = 1, pingpong = false, clipName = null;
   if (hasClip) { // clip mas largo = animacion principal
@@ -88,7 +103,7 @@ window.renderFrames = async (id, N = 48) => {
     frames.push(renderer.domElement.toDataURL('image/png'));
   }
   scene.traverse(o=>{ if(o.geometry) o.geometry.dispose(); });
-  return { frames, hasClip, clips: gltf.animations.length, clipName, pingpong };
+  return { frames, hasClip, clips: gltf.animations.length, clipName, pingpong, armsPosed };
 };
 window.ready = true;
 </script>

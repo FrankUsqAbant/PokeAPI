@@ -30,7 +30,7 @@ await page.waitForFunction(() => window.ready === true, null, { timeout: 60000 }
 const report = [];
 for (const id of ids) {
   const t0 = Date.now();
-  const { frames, hasClip, clips, clipName, pingpong } = await page.evaluate(i => window.renderFrames(i, 48), id);
+  const { frames, hasClip, clips, clipName, pingpong, armsPosed } = await page.evaluate(([i, ARMS]) => window.renderFrames(i, 48, ARMS), [id, +(process.env.ARMS || 0)]);
   const dir = path.join(OUT, `f${id}`); fs.mkdirSync(dir, { recursive: true });
   frames.forEach((d, i) => fs.writeFileSync(path.join(dir, `f${String(i).padStart(3, '0')}.png`), Buffer.from(d.split(',')[1], 'base64')));
   const webp = path.join(OUT, `${id}.webp`);
@@ -39,7 +39,7 @@ for (const id of ids) {
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path.join(dir, 'f012.png'), '-vf', `scale=${OUTW}:-1:flags=lanczos`, '-q:v', '82', path.join(OUT, `${id}-still.webp`)]);
   fs.rmSync(dir, { recursive: true });
   const kb = Math.round(fs.statSync(webp).size / 1024);
-  report.push({ id, hasClip, clips, clipName, pingpong, kb, seg: ((Date.now() - t0) / 1000).toFixed(1) });
+  report.push({ id, hasClip, clips, clipName, pingpong, armsPosed, kb, seg: ((Date.now() - t0) / 1000).toFixed(1) });
   console.log(JSON.stringify(report.at(-1)));
 }
 fs.writeFileSync(path.join(OUT, 'report.json'), JSON.stringify(report, null, 2));
