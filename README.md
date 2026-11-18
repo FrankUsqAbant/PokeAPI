@@ -31,11 +31,10 @@ Pokédex de los **151 Pokémon de Kanto**, con modelos 3D que se mueven, hecha c
 index.html · css/ · js/        Sitio
 data/pokedex.json              Datos de los 151 (scripts/build_data.mjs)
 img/3d/                        Reposo (s/), loops animados y hero
-scripts/render/                Render 3D → WebP animado (Three.js + Playwright)
-.github/workflows/             deploy.yml (Pages) y render.yml (render 3D)
+.github/workflows/deploy.yml   Despliegue en GitHub Pages
 ```
 
-Regenerar el 3D: ejecutar el workflow **Render 3D a WebP animado** (`ids`, `size`, `outw`, `q`, `arms`). Los `.glb` originales están en `models/` y no se publican.
+Los renders 3D ya vienen hechos. Las herramientas de render y los `.glb` originales se retiraron del repo; siguen en el historial de git (commit `0429161`) y los modelos en [Pokemon 3D API](https://github.com/Pokemon-3D-api/assets).
 
 ## 📄 Créditos y licencia
 
