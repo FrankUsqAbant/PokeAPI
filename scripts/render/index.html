@@ -30,7 +30,7 @@ window.renderFrames = async (id, N = 48, armsDown = 0) => {
   let armsPosed = 0;
   if (armsDown > 0) {
     root.updateMatrixWorld(true);
-    const arms = []; root.traverse(o => { if (o.isBone && /(^|\s)[LR]Arm$/.test(o.name)) arms.push(o); });
+    const arms = []; root.traverse(o => { if (o.isBone && /(^|[\s_])[LR]Arm$/.test(o.name)) arms.push(o); });
     const xs = arms.map(b => new THREE.Vector3().setFromMatrixPosition(b.matrixWorld).x);
     const mid = xs.length ? xs.reduce((a,b)=>a+b,0)/xs.length : 0;
     arms.forEach((b, k) => {
