@@ -33,8 +33,16 @@ window.renderFrames = async (id, N = 48) => {
     mixer = new THREE.AnimationMixer(root); mixer.clipAction(clip).play(); dur = Math.max(clip.duration, 0.1);
     mixer.setTime(0);
   }
-  // encuadre sobre la pose inicial
-  const box = new THREE.Box3().setFromObject(root); const size = box.getSize(new THREE.Vector3()); const c = box.getCenter(new THREE.Vector3());
+  // encuadre: caja precisa (con esqueleto aplicado) unida sobre varios instantes del bucle
+  const box = new THREE.Box3();
+  for (let j=0;j<8;j++) {
+    if (mixer) mixer.setTime(j/8*dur);
+    root.updateMatrixWorld(true);
+    root.traverse(o => { if (o.isSkinnedMesh) o.skeleton.update(); });
+    box.union(new THREE.Box3().setFromObject(root, true));
+  }
+  if (mixer) mixer.setTime(0);
+  const size = box.getSize(new THREE.Vector3()); const c = box.getCenter(new THREE.Vector3());
   root.position.sub(c); const R = Math.max(size.x,size.y,size.z)/2 || 1;
   const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
   const dist = (R*1.25) / Math.sin(THREE.MathUtils.degToRad(15));
